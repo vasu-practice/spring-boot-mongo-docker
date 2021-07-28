@@ -1,45 +1,29 @@
-version: '3.1'
-
+version: "3.5"
 services:
-  springboot:
-    image: dockerhandson/spring-boot-mongo:latest
-    restart: always # This will be ignored if we deploy in docker swarm
-    environment:
+  springapp:   # spring app frontend container
+    image: vasudockerhubacc/spring-boot-mongo:1  # image of spring-boot-mongo:1
+    depends_on: # why because this depends_on is using here 2 apps is there 1 is frontendapp 2nd backend app.so backend app should
+    - mongo
+    ports:                   # port forwarding here
+    - 8080:8080
+    environment:             # setting env varables to connect database application
     - MONGO_DB_HOSTNAME=mongo
     - MONGO_DB_USERNAME=devdb
-    - MONGO_DB_PASSWORD=devdb123
-    ports:
-      - 8080:8080
-    working_dir: /opt/app
-    depends_on:
-      - mongo
-    networks:
-    - springappnetwork  
-    deploy:  # This will be considered only in docker swarm.
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 20s
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 5
-
-  mongo:
-    image: mongo
-    environment:
-    - MONGO_INITDB_ROOT_USERNAME=devdb
-    - MONGO_INITDB_ROOT_PASSWORD=devdb123
-    volumes:
-      - mongodb:/data/db
-    restart: always
+    - MONGO_DB_PASSWORD=devdb1234
     networks:
     - springappnetwork
-    
-volumes:
-  mongodb:
-    external: true
-    
-networks:
-  springappnetwork:
-    external: true
+  mongo:      # mongo database application container
+    image: mongo
+    environment:
+    - MONGO_INITDB_ROOT_USERNAME=devdb        #setting env variabes to login into db
+    - MONGO_INITDB_ROOT_PASSWORD=devdb1234
+    volumes:                # creating volumes for storing container data from db
+    - mongovol:/data/db     # db container data mounting to /data/bd folder
+    networks:               # assining network for db container for communication
+    - springappnetwork
+volumes:              # in this section whatever volumes we are using we need to define here
+    mongovol:
+         # driver: local is default driver
+networks:             # in this section whatever networks we are using we need to define here
+   springappnetwork:
+        # bridge is default network driver
