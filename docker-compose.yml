@@ -1,45 +1,37 @@
-version: '3.1'
-
-services:
-  springboot:
-    image: dockerhandson/spring-boot-mongo:latest
-    restart: always # This will be ignored if we deploy in docker swarm
-    environment:
-    - MONGO_DB_HOSTNAME=mongo
-    - MONGO_DB_USERNAME=devdb
-    - MONGO_DB_PASSWORD=devdb123
-    ports:
-      - 8080:8080
-    working_dir: /opt/app
-    depends_on:
-      - mongo
-    networks:
-    - springappnetwork  
-    deploy:  # This will be considered only in docker swarm.
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 20s
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 5
-
-  mongo:
-    image: mongo
-    environment:
-    - MONGO_INITDB_ROOT_USERNAME=devdb
-    - MONGO_INITDB_ROOT_PASSWORD=devdb123
-    volumes:
-      - mongodb:/data/db
-    restart: always
-    networks:
-    - springappnetwork
-    
-volumes:
-  mongodb:
-    external: true
-    
-networks:
-  springappnetwork:
-    external: true
+node
+{
+def buildNumber = BUILD_NUMBER
+stage ("git cloning")
+{
+git credentialsId: 'github-credentials-new', url: 'https://github.com/vasu-practice/spring-boot-mongo-docker.git'
+}
+stage ("building the package")
+{
+def mavenHome = tool name: "maven", type: "maven"
+sh "${mavenHome}/bin/mvn package"    
+}
+stage ("Build the docker image")
+{
+sh "docker build -t vasudockerhubacc/spring-boot-mongo-docker:${buildNumber} ."
+}
+stage ("docker login and push the images to docker hub")
+{
+withCredentials([string(credentialsId: 'docker_hub_pwd', variable: 'docker_hub_pwd')])
+{
+sh "docker login -u vasudockerhubacc -p ${docker_hub_pwd}"  
+}
+sh "docker push vasudockerhubacc/spring-boot-mongo-docker:${buildNumber}"
+}
+stage("changing tag using sed") 
+{
+sh "sed -i s/latest/${buildNumber}/ docker-compose.yml"
+}  
+stage ("copying docker-compose.yml file deployment server")
+{
+   sshagent(['docker_dev_server_ssh'])
+{
+sh "scp -o StrictHostkeyChecking=no docker-compose.yml ubuntu@3.108.217.80:/home/ubuntu"
+sh "ssh -o StrictHostkeyChecking=no ubuntu@3.108.217.80 docker-compose up -d"
+}
+}
+}
