@@ -1,0 +1,29 @@
+version: "3.5"
+services:
+  springapp:   # spring app frontend container
+    image: vasudockerhubacc/spring-boot-mongo:1  # image of spring-boot-mongo:1
+    depends_on: # why because this depends_on is using here 2 apps is there 1 is frontendapp 2nd backend app.so backend app should
+    - mongo
+    ports:                   # port forwarding here
+    - 8081:8080
+    environment:             # setting env varables to connect database application
+    - MONGO_DB_HOSTNAME=mongo
+    - MONGO_DB_USERNAME=devdb
+    - MONGO_DB_PASSWORD=devdb1234
+    networks:
+    - springappnetwork
+  mongo:      # mongo database application container
+    image: mongo
+    environment:
+    - MONGO_INITDB_ROOT_USERNAME=devdb        #setting env variabes to login into db
+    - MONGO_INITDB_ROOT_PASSWORD=devdb1234
+    volumes:                # creating volumes for storing container data from db
+    - mongovol:/data/db     # db container data mounting to /data/bd folder
+    networks:               # assining network for db container for communication
+    - springappnetwork
+volumes:              # in this section whatever volumes we are using we need to define here
+    mongovol:
+         # driver: local is default driver
+networks:             # in this section whatever networks we are using we need to define here
+   springappnetwork:
+        # bridge is default network driver
