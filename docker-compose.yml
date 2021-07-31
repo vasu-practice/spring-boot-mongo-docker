@@ -1,7 +1,7 @@
 #we have here 1 is front-end-application service and 2nd one db containser service so 2 services.
 version: "3.5"
 services:
-  springapp:   # spring app frontend container
+  springapp:   # spring app frontend container or service name
     image: vasudockerhubacc/spring-boot-mongo:1  # image of spring-boot-mongo:1
     depends_on: # why because this depends_on is using here 2 apps is there 1 is frontendapp 2nd backend app.so backend app should start first only then only frontent app run.
     - mongo      #backend app container name/image name
@@ -12,8 +12,9 @@ services:
     - MONGO_DB_USERNAME=vasu
     - MONGO_DB_PASSWORD=vasu123
     networks:
-    - springappoverlay # now using for dockerswarm 
-   # - springappnetwork used for docker compose for bridge n/w
+    - springappoverlay # now using for dockerswarm
+    deploy:  # This will be considered in only in swarm. if u want more containers then we deploy mode option 
+      replicas:2                                                          # - springappnetwork used for docker compose for bridge n/w
  # mongo db container creation:
  #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  mongo:      # here creating mongo database application container
