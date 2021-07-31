@@ -26,7 +26,7 @@ services:
  # note here for database container i did not mention deploy mode option means (replicas:2) like this.So it will create only 1 replica by default.
  # mongo db container creation:
  #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- mongo:      # here creating mongo database application container
+  mongo:      # here creating mongo database application container
     image: mongo
     environment:
     - MONGO_INITDB_ROOT_USERNAME=vasu        #setting env variabes to login into db
