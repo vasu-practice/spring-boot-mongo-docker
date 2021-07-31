@@ -12,7 +12,8 @@ services:
     - MONGO_DB_USERNAME=vasu
     - MONGO_DB_PASSWORD=vasu123
     networks:
-    - springappnetwork
+    - springappoverlay # now using for dockerswarm 
+   # - springappnetwork used for docker compose for bridge n/w
  # mongo db container creation:
  #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  mongo:      # here creating mongo database application container
@@ -23,12 +24,14 @@ services:
     volumes:                # creating volumes for storing container data from db
     - mongovol:/data/db     # db container data mounting to /data/bd folder
     networks:               # assining network for db container for communication
-    - springappnetwork
+    - springappoverlay
+    #- springappnetwork
 volumes:              # in this section whatever volumes we are using we need to define here
     mongovol:
          # driver: local is default driver
 networks:             # in this section whatever networks we are using we need to define here
-   springappnetwork:
+    springappoverlay: # now using for dockerswarm (overlay n/w is default network)
+   #springappnetwork:
         # bridge is default network driver
 
 
