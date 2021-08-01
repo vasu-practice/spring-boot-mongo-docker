@@ -15,7 +15,7 @@ services:
     - customoverlay
     #- springappoverlay # now using for dockerswarm
     deploy:  # This will be considered in only in swarm. if u want more containers then we deploy mode option 
-      replicas:2                                                          # - springappnetwork used for docker compose for bridge n/w
+      replicas: 2                                                          # - springappnetwork used for docker compose for bridge n/w
       update_config:    # for rolling updates even for without down time we use rolling update concept. if we are updating image version 1 to 2 then if u this there is no downtime.
         parallelism: 1  # it will remove 1 old container and it will wait for 20s to create 1 new conatiner.
         delay: 20s
